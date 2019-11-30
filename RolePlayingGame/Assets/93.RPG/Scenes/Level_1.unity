@@ -278,8 +278,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21d1b900c51e40c4eb3aaa04b0a06843, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WalkSpeed: 2
-  RunSpeed: 4
+  WalkSpeed: 4
+  RunSpeed: 8
   TurningSpeed: 100
   RotateSpeed: 2
   VelocitySpeed: 0.01
@@ -438,7 +438,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4909903464192160, guid: aac26e4372c4040afb6fb7240864c51e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4909903464192160, guid: aac26e4372c4040afb6fb7240864c51e, type: 3}
       propertyPath: m_LocalPosition.z

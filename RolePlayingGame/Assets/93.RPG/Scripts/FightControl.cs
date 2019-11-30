@@ -14,7 +14,7 @@ public class FightControl : MonoBehaviour
     public float VelocitySpeed = 0.1f;
     
     private Vector3 CurrentVelocity = Vector3.zero;
-    private Vector3 MoveDirection = Vector3.zero;
+    private Vector3 CurrentDirection = Vector3.zero;
 
     private CharacterController myCharacterController = null;
     private CollisionFlags myCollisionFlags = CollisionFlags.None;
@@ -26,7 +26,9 @@ public class FightControl : MonoBehaviour
 
     void Update()
     {
-        
+        Move();
+
+        BodyDirectionChange();
     }
 
     /// <summary>
@@ -42,5 +44,54 @@ public class FightControl : MonoBehaviour
         float vertical = Input.GetAxis("Vertical");
         float horizontal = Input.GetAxis("Horizontal");
         Vector3 targetDirection = horizontal * right + vertical * forward;
+
+        CurrentDirection = Vector3.RotateTowards(CurrentDirection, targetDirection, TurningSpeed * Mathf.Deg2Rad * Time.deltaTime, 1000.0f);
+        CurrentDirection = CurrentDirection.normalized;
+
+        Vector3 moveAmount = (CurrentDirection * WalkSpeed * Time.deltaTime);
+        myCollisionFlags = myCharacterController.Move(moveAmount);
+    }
+
+    /// <summary>
+    /// Get Current Character Move Speed
+    /// </summary>
+    /// <returns></returns>
+    float GetVelocitySpeed()
+    {
+        if (myCharacterController.velocity == Vector3.zero)
+        {
+            CurrentVelocity = Vector3.zero;
+        }
+        else
+        {
+            Vector3 goalVelocity = myCharacterController.velocity;
+            goalVelocity.y = 0.0f;
+            CurrentVelocity = Vector3.Lerp(CurrentVelocity, goalVelocity, VelocitySpeed * Time.fixedDeltaTime);
+        }
+
+        return CurrentVelocity.magnitude;
+    }
+
+    /// <summary>
+    /// Rotate Body to Forward Direction
+    /// </summary>
+    void BodyDirectionChange()
+    {
+        if (GetVelocitySpeed() > 0.0f)
+        {
+            Vector3 newForward = myCharacterController.velocity;
+            newForward.y = 0.0f;
+            transform.forward = Vector3.Lerp(transform.forward, newForward, RotateSpeed * Time.deltaTime);
+        }
+    }
+    private void OnGUI()
+    {
+        GUILayout.Label("Speed: " + GetVelocitySpeed().ToString());
+
+        if (myCharacterController != null && myCharacterController.velocity != Vector3.zero)
+        {
+            GUILayout.Label("Velocity Vector: " + myCharacterController.velocity.ToString());
+            GUILayout.Label("Velocity Magnitude: " + myCharacterController.velocity.magnitude.ToString());
+        }
     }
 }
