@@ -11,7 +11,7 @@ public class FightControl : MonoBehaviour
     public float RotateSpeed = 2.0f;
 
     [Range(0.01f, 5.0f)]
-    public float VelocitySpeed = 0.1f;
+    public float VelocitySpeed = 0.4f;
     
     private Vector3 CurrentVelocity = Vector3.zero;
     private Vector3 CurrentDirection = Vector3.zero;
@@ -19,16 +19,51 @@ public class FightControl : MonoBehaviour
     private CharacterController myCharacterController = null;
     private CollisionFlags myCollisionFlags = CollisionFlags.None;
 
+    [Header("Animation Properties")]
+    public AnimationClip IdleAnimClip = null;
+    public AnimationClip WalkAnimClip = null;
+    public AnimationClip RunAnimClip = null;
+    public AnimationClip Attack1AnimClip = null;
+    public AnimationClip Attack2AnimClip = null;
+    public AnimationClip Attack3AnimClip = null;
+    public AnimationClip Attack4AnimClip = null;
+    private Animation myAnimation = null;
+
+    public enum FighterState { None, Idle, Walk, Run, Attack, Skill }
+    [Header("Character Properties")]
+    public FighterState myState = FighterState.None;
+
+    public enum FighterAttackState { Attack1, Attack2, Attack3, Attack4 }
+    public FighterAttackState myAttackState = FighterAttackState.Attack1;
+    public bool NextAttack = false;
+
     void Start()
     {
         myCharacterController = GetComponent<CharacterController>();
+
+        myAnimation = GetComponent<Animation>();
+        myAnimation.playAutomatically = false;
+        myAnimation.Stop();
+
+        myState = FighterState.Idle;
+        myAnimation[IdleAnimClip.name].wrapMode = WrapMode.Loop;
+        myAnimation[WalkAnimClip.name].wrapMode = WrapMode.Loop;
+        myAnimation[RunAnimClip.name].wrapMode = WrapMode.Loop;
+        myAnimation[Attack1AnimClip.name].wrapMode = WrapMode.Once;
+        myAnimation[Attack2AnimClip.name].wrapMode = WrapMode.Once;
+        myAnimation[Attack3AnimClip.name].wrapMode = WrapMode.Once;
+        myAnimation[Attack4AnimClip.name].wrapMode = WrapMode.Once;
     }
 
     void Update()
     {
+        // Character Move
         Move();
-
         BodyDirectionChange();
+
+        // Character Animation
+        AnimationControl();
+        CheckState();
     }
 
     /// <summary>
@@ -48,7 +83,14 @@ public class FightControl : MonoBehaviour
         CurrentDirection = Vector3.RotateTowards(CurrentDirection, targetDirection, TurningSpeed * Mathf.Deg2Rad * Time.deltaTime, 1000.0f);
         CurrentDirection = CurrentDirection.normalized;
 
-        Vector3 moveAmount = (CurrentDirection * WalkSpeed * Time.deltaTime);
+        float speed = WalkSpeed;
+        
+        if (myState == FighterState.Run)
+        {
+            speed = RunSpeed;
+        }
+
+        Vector3 moveAmount = (CurrentDirection * speed * Time.deltaTime);
         myCollisionFlags = myCharacterController.Move(moveAmount);
     }
 
@@ -84,6 +126,177 @@ public class FightControl : MonoBehaviour
             transform.forward = Vector3.Lerp(transform.forward, newForward, RotateSpeed * Time.deltaTime);
         }
     }
+
+    /// <summary>
+    /// Animation Methods
+    /// </summary>
+    /// <param name="clip"></param>
+    void AnimationPlay(AnimationClip clip)
+    {
+        myAnimation.clip = clip;
+        myAnimation.CrossFade(clip.name);
+    }
+
+    void AnimationControl()
+    {
+        switch (myState)
+        {
+            case FighterState.Idle:
+                AnimationPlay(IdleAnimClip);
+                break;
+
+            case FighterState.Walk:
+                AnimationPlay(WalkAnimClip);
+                break;
+
+            case FighterState.Run:
+                AnimationPlay(RunAnimClip);
+                break;
+
+            case FighterState.Attack:
+                AnimationPlay(Attack1AnimClip);
+                break;
+        }
+    }
+
+    void CheckState()
+    {
+        float currentSpeed = GetVelocitySpeed();
+        Debug.Log("CheckState - Velocity Speed: " + currentSpeed);
+
+        switch (myState)
+        {
+            case FighterState.Idle:
+
+                if (currentSpeed > 0.0f)
+                {
+                    myState = FighterState.Walk;
+                }
+
+                break;
+
+            case FighterState.Walk:
+
+                if (currentSpeed > 0.5f)
+                {
+                    myState = FighterState.Run;
+                }
+                else if (currentSpeed < 0.01f)
+                {
+                    myState = FighterState.Idle;
+                }
+
+                break;
+
+            case FighterState.Run:
+
+                if (currentSpeed < 0.01f)
+                {
+                    myState = FighterState.Idle;
+                }
+                else if (currentSpeed < 0.5f)
+                {
+                    myState = FighterState.Walk;
+                }
+
+                break;
+
+            case FighterState.Attack:
+                break;
+
+            case FighterState.Skill:
+                break;
+        }
+    }
+
+    void InputControl()
+    {
+        if (Input.GetButton("Fire1") == true)
+        {
+            if (myState != FighterState.Attack)
+            {
+                myState = FighterState.Attack;
+                myAttackState = FighterAttackState.Attack1;
+            }
+            else
+            {
+                switch (myAttackState)
+                {
+                    case FighterAttackState.Attack1:
+
+                        if (myAnimation[Attack1AnimClip.name].normalizedTime > 0.1)
+                        {
+                            NextAttack = true;
+                        }
+
+                        break;
+
+                    case FighterAttackState.Attack2:
+
+                        if (myAnimation[Attack2AnimClip.name].normalizedTime > 0.1f)
+                        {
+                            NextAttack = true;
+                        }
+
+                        break;
+
+                    case FighterAttackState.Attack3:
+
+                        if (myAnimation[Attack3AnimClip.name].normalizedTime > 0.1f)
+                        {
+                            NextAttack = true;
+                        }
+
+                        break;
+
+                    case FighterAttackState.Attack4:
+
+                        if (myAnimation[Attack4AnimClip.name].normalizedTime > 0.1f)
+                        {
+                            NextAttack = true;
+                        }
+
+                        break;
+                }
+            }
+        }
+    }
+
+    void OnAttackAnimFinished()
+    {
+        if (NextAttack == true)
+        {
+            NextAttack = false;
+
+            switch(myAttackState)
+            {
+                case FighterAttackState.Attack1:
+                    myAttackState = FighterAttackState.Attack2;
+                    break;
+
+                case FighterAttackState.Attack2:
+                    myAttackState = FighterAttackState.Attack3;
+                    break;
+
+                case FighterAttackState.Attack3:
+                    myAttackState = FighterAttackState.Attack4;
+                    break;
+
+                case FighterAttackState.Attack4:
+                    myAttackState = FighterAttackState.Attack1;
+                    break;
+            }
+        }
+        else
+        {
+            myState = FighterState.Idle;
+            myAttackState = FighterAttackState.Attack1;
+        }
+    }
+
+    /// <summary>
+    ///  GUI Methods
+    /// </summary>
     private void OnGUI()
     {
         GUILayout.Label("Speed: " + GetVelocitySpeed().ToString());
