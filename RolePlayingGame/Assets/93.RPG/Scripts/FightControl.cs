@@ -53,6 +53,11 @@ public class FightControl : MonoBehaviour
         myAnimation[Attack2AnimClip.name].wrapMode = WrapMode.Once;
         myAnimation[Attack3AnimClip.name].wrapMode = WrapMode.Once;
         myAnimation[Attack4AnimClip.name].wrapMode = WrapMode.Once;
+
+		AddAnimationEvent(Attack1AnimClip, "OnAttackAnimFinished");
+		AddAnimationEvent(Attack2AnimClip, "OnAttackAnimFinished");
+		AddAnimationEvent(Attack3AnimClip, "OnAttackAnimFinished");
+		AddAnimationEvent(Attack4AnimClip, "OnAttackAnimFinished");
     }
 
     void Update()
@@ -64,7 +69,10 @@ public class FightControl : MonoBehaviour
         // Character Animation
         AnimationControl();
         CheckState();
-    }
+		
+		// User Control
+		InputControl();
+	}
 
     /// <summary>
     /// Movement Functions
@@ -154,7 +162,7 @@ public class FightControl : MonoBehaviour
                 break;
 
             case FighterState.Attack:
-                AnimationPlay(Attack1AnimClip);
+                AttackAnimationControl();
                 break;
         }
     }
@@ -293,11 +301,41 @@ public class FightControl : MonoBehaviour
             myAttackState = FighterAttackState.Attack1;
         }
     }
+	
+	void AddAnimationEvent(AnimationClip clip, string FuncName)
+	{
+		AnimationEvent newEvnet = new AnimationEvent();
+		newEvnet.functionName = FuncName;
+		newEvnet.time = clip.length - 0.1f;
+		clip.AddEvent(newEvnet);
+	}
+
+	void AttackAnimationControl()
+	{
+		switch (myAttackState)
+		{
+			case FighterAttackState.Attack1:
+				AnimationPlay(Attack1AnimClip);
+				break;
+
+			case FighterAttackState.Attack2:
+				AnimationPlay(Attack2AnimClip);
+				break;
+
+			case FighterAttackState.Attack3:
+				AnimationPlay(Attack3AnimClip);
+				break;
+
+			case FighterAttackState.Attack4:
+				AnimationPlay(Attack4AnimClip);
+				break;
+		}
+	}
 
     /// <summary>
     ///  GUI Methods
     /// </summary>
-    private void OnGUI()
+    void OnGUI()
     {
         GUILayout.Label("Speed: " + GetVelocitySpeed().ToString());
 
