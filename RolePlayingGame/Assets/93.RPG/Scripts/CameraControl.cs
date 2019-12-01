@@ -68,7 +68,7 @@ public class CameraControl : MonoBehaviour
     void FirstView()
     {
         float mouseX = Input.GetAxis("Mouse X");
-        float mouseYwdws = Input.GetAxis("Mouse Y");
+        float mouseY = Input.GetAxis("Mouse Y");
 
         rotationX = myTransform.localEulerAngles.y + mouseX * SensitivityX;
         rotationX = (rotationX > 180.0f) ? rotationX - 360.0f: rotationX;
