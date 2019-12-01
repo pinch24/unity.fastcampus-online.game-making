@@ -18,6 +18,9 @@ public class FightControl : MonoBehaviour
 
     private CharacterController myCharacterController = null;
     private CollisionFlags myCollisionFlags = CollisionFlags.None;
+    private float gravity = 9.8f;
+    private float verticalSpeed = 0.0f;
+    private bool CannotMove = false;
 
     [Header("Animation Properties")]
     public AnimationClip IdleAnimClip = null;
@@ -72,6 +75,9 @@ public class FightControl : MonoBehaviour
 		
 		// User Control
 		InputControl();
+
+        // Physics
+        ApplyGravity();
 	}
 
     /// <summary>
@@ -79,6 +85,12 @@ public class FightControl : MonoBehaviour
     /// </summary>
     void Move()
     {
+        if (CannotMove == true)
+        {
+            return;
+        }
+
+        // Move Direction
         Transform CameraTransform = Camera.main.transform;
         Vector3 forward = CameraTransform.TransformDirection(Vector3.forward);
         forward.y = 0.0f;
@@ -91,6 +103,7 @@ public class FightControl : MonoBehaviour
         CurrentDirection = Vector3.RotateTowards(CurrentDirection, targetDirection, TurningSpeed * Mathf.Deg2Rad * Time.deltaTime, 1000.0f);
         CurrentDirection = CurrentDirection.normalized;
 
+        // Move Distance
         float speed = WalkSpeed;
         
         if (myState == FighterState.Run)
@@ -98,7 +111,8 @@ public class FightControl : MonoBehaviour
             speed = RunSpeed;
         }
 
-        Vector3 moveAmount = (CurrentDirection * speed * Time.deltaTime);
+        Vector3 gravityVector = new Vector3(0.0f, verticalSpeed, 0.0f);
+        Vector3 moveAmount = (CurrentDirection * speed * Time.deltaTime) + gravityVector;
         myCollisionFlags = myCharacterController.Move(moveAmount);
     }
 
@@ -170,8 +184,7 @@ public class FightControl : MonoBehaviour
     void CheckState()
     {
         float currentSpeed = GetVelocitySpeed();
-        Debug.Log("CheckState - Velocity Speed: " + currentSpeed);
-
+        
         switch (myState)
         {
             case FighterState.Idle:
@@ -210,9 +223,11 @@ public class FightControl : MonoBehaviour
                 break;
 
             case FighterState.Attack:
+                CannotMove = true;
                 break;
 
             case FighterState.Skill:
+                CannotMove = true;
                 break;
         }
     }
@@ -299,6 +314,8 @@ public class FightControl : MonoBehaviour
         {
             myState = FighterState.Idle;
             myAttackState = FighterAttackState.Attack1;
+
+            CannotMove = false;
         }
     }
 	
@@ -332,11 +349,27 @@ public class FightControl : MonoBehaviour
 		}
 	}
 
+    void ApplyGravity()
+    {
+        if ((myCollisionFlags & CollisionFlags.CollidedBelow) != 0)
+        {
+            verticalSpeed = 0.0f;
+        }
+        else
+        {
+            verticalSpeed -= gravity * Time.deltaTime;
+        }
+    }
+
     /// <summary>
     ///  GUI Methods
     /// </summary>
     void OnGUI()
     {
+        // Collision
+        GUILayout.Label("Collision: " + myCollisionFlags.ToString());
+
+        // Velocity
         GUILayout.Label("Speed: " + GetVelocitySpeed().ToString());
 
         if (myCharacterController != null && myCharacterController.velocity != Vector3.zero)
