@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Holoville.HOTween;
 
 public class GoblinControl : MonoBehaviour
 {
@@ -28,6 +29,9 @@ public class GoblinControl : MonoBehaviour
     public int HP = 100;
     public float AttackRange = 1.5f;
     public GameObject DamageEffect = null;
+    public GameObject DieEffect = null;
+    private Tweener effectTweener = null;
+    private SkinnedMeshRenderer skinMeshRenderer = null;
 
     void Start()
     {
@@ -51,6 +55,9 @@ public class GoblinControl : MonoBehaviour
         AddAnimationEvent(AttackAnimClip, "OnAttackAnimFinished");
         AddAnimationEvent(DamageAnimClip, "OnDamageAnimFinished");
         AddAnimationEvent(DieAnimClip, "OnDieAnimFinished");
+        
+        // Set Tweener
+        skinMeshRenderer = myTransform.Find("body").GetComponent<SkinnedMeshRenderer>();
     }
     
     void Update()
@@ -169,7 +176,15 @@ public class GoblinControl : MonoBehaviour
         goblinState = GoblinState.Idle;
     }
     
-    void AttackUpdate() {}
+    void AttackUpdate()
+    {
+        float distance = Vector3.Distance(TargetTransform.position, myTransform.position);
+        
+        if (distance > AttackRange + 0.5f)
+        {
+            goblinState = GoblinState.MoveToTarget;
+        }
+    }
     
     void AnimationControl()
     {
@@ -190,6 +205,54 @@ public class GoblinControl : MonoBehaviour
                 myAnimation.CrossFade(DieAnimClip.name);
                 break;
         }
+    }
+    
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("PlayerAttack") == true)
+        {
+            HP -= 10;
+            
+            if (HP > 0)
+            {
+                Instantiate(DamageEffect, other.transform.position, Quaternion
+                .identity);
+                
+                myAnimation.CrossFade(DamageAnimClip.name);
+                
+                DamageTweenEffect();
+            }
+            else
+            {
+                goblinState = GoblinState.Die;
+            }
+        }
+    }
+    
+    void DamageTweenEffect()
+    {
+        if (effectTweener != null && effectTweener.isComplete == false)
+        {
+            return;
+        }
+        else
+        {
+            Color colorTo = Color.red;
+            effectTweener = HOTween.To(skinMeshRenderer.material, 0.2f, new TweenParms().Prop("color", colorTo).Loops(1, LoopType.Yoyo).OnStepComplete(OnDamageTweenFinished));
+        }
+    }
+    
+    void OnDamageTweenFinished()
+    {
+        skinMeshRenderer.material.color = Color.white;
+    }
+    
+    void OnSetTarget(GameObject target)
+    {
+        TargetPlayer = target;
+        TargetTransform = TargetPlayer.transform;
+        
+        goblinState = GoblinState.MoveToTarget;
     }
     
     /// <summary>
