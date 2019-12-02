@@ -12,7 +12,7 @@ public class FightControl : MonoBehaviour
 
     [Range(0.01f, 5.0f)]
     public float VelocitySpeed = 0.4f;
-    
+
     private Vector3 CurrentVelocity = Vector3.zero;
     private Vector3 CurrentDirection = Vector3.zero;
 
@@ -57,10 +57,10 @@ public class FightControl : MonoBehaviour
         myAnimation[Attack3AnimClip.name].wrapMode = WrapMode.Once;
         myAnimation[Attack4AnimClip.name].wrapMode = WrapMode.Once;
 
-		AddAnimationEvent(Attack1AnimClip, "OnAttackAnimFinished");
-		AddAnimationEvent(Attack2AnimClip, "OnAttackAnimFinished");
-		AddAnimationEvent(Attack3AnimClip, "OnAttackAnimFinished");
-		AddAnimationEvent(Attack4AnimClip, "OnAttackAnimFinished");
+        AddAnimationEvent(Attack1AnimClip, "OnAttackAnimFinished");
+        AddAnimationEvent(Attack2AnimClip, "OnAttackAnimFinished");
+        AddAnimationEvent(Attack3AnimClip, "OnAttackAnimFinished");
+        AddAnimationEvent(Attack4AnimClip, "OnAttackAnimFinished");
     }
 
     void Update()
@@ -72,13 +72,13 @@ public class FightControl : MonoBehaviour
         // Character Animation
         AnimationControl();
         CheckState();
-		
-		// User Control
-		InputControl();
+
+        // User Control
+        InputControl();
 
         // Physics
         ApplyGravity();
-	}
+    }
 
     /// <summary>
     /// Movement Functions
@@ -105,7 +105,7 @@ public class FightControl : MonoBehaviour
 
         // Move Distance
         float speed = WalkSpeed;
-        
+
         if (myState == FighterState.Run)
         {
             speed = RunSpeed;
@@ -184,7 +184,7 @@ public class FightControl : MonoBehaviour
     void CheckState()
     {
         float currentSpeed = GetVelocitySpeed();
-        
+
         switch (myState)
         {
             case FighterState.Idle:
@@ -291,7 +291,7 @@ public class FightControl : MonoBehaviour
         {
             NextAttack = false;
 
-            switch(myAttackState)
+            switch (myAttackState)
             {
                 case FighterAttackState.Attack1:
                     myAttackState = FighterAttackState.Attack2;
@@ -318,36 +318,36 @@ public class FightControl : MonoBehaviour
             CannotMove = false;
         }
     }
-	
-	void AddAnimationEvent(AnimationClip clip, string FuncName)
-	{
-		AnimationEvent newEvnet = new AnimationEvent();
-		newEvnet.functionName = FuncName;
-		newEvnet.time = clip.length - 0.1f;
-		clip.AddEvent(newEvnet);
-	}
 
-	void AttackAnimationControl()
-	{
-		switch (myAttackState)
-		{
-			case FighterAttackState.Attack1:
-				AnimationPlay(Attack1AnimClip);
-				break;
+    void AddAnimationEvent(AnimationClip clip, string FuncName)
+    {
+        AnimationEvent newEvnet = new AnimationEvent();
+        newEvnet.functionName = FuncName;
+        newEvnet.time = clip.length - 0.1f;
+        clip.AddEvent(newEvnet);
+    }
 
-			case FighterAttackState.Attack2:
-				AnimationPlay(Attack2AnimClip);
-				break;
+    void AttackAnimationControl()
+    {
+        switch (myAttackState)
+        {
+            case FighterAttackState.Attack1:
+                AnimationPlay(Attack1AnimClip);
+                break;
 
-			case FighterAttackState.Attack3:
-				AnimationPlay(Attack3AnimClip);
-				break;
+            case FighterAttackState.Attack2:
+                AnimationPlay(Attack2AnimClip);
+                break;
 
-			case FighterAttackState.Attack4:
-				AnimationPlay(Attack4AnimClip);
-				break;
-		}
-	}
+            case FighterAttackState.Attack3:
+                AnimationPlay(Attack3AnimClip);
+                break;
+
+            case FighterAttackState.Attack4:
+                AnimationPlay(Attack4AnimClip);
+                break;
+        }
+    }
 
     void ApplyGravity()
     {
