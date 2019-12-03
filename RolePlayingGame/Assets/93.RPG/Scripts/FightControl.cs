@@ -30,6 +30,8 @@ public class FightControl : MonoBehaviour
     public AnimationClip Attack2AnimClip = null;
     public AnimationClip Attack3AnimClip = null;
     public AnimationClip Attack4AnimClip = null;
+    public AnimationClip SkillAnimClip = null;
+    
     private Animation myAnimation = null;
 
     public enum FighterState { None, Idle, Walk, Run, Attack, Skill }
@@ -39,7 +41,12 @@ public class FightControl : MonoBehaviour
     public enum FighterAttackState { Attack1, Attack2, Attack3, Attack4 }
     public FighterAttackState myAttackState = FighterAttackState.Attack1;
     public bool NextAttack = false;
-
+    
+    [Header("Battle Properties")]
+    public TrailRenderer AttackTrailRenderer = null;
+    public CapsuleCollider AttackCapsuleCollider = null;
+    public GameObject SkillEffect = null;
+    
     void Start()
     {
         myCharacterController = GetComponent<CharacterController>();
@@ -56,11 +63,13 @@ public class FightControl : MonoBehaviour
         myAnimation[Attack2AnimClip.name].wrapMode = WrapMode.Once;
         myAnimation[Attack3AnimClip.name].wrapMode = WrapMode.Once;
         myAnimation[Attack4AnimClip.name].wrapMode = WrapMode.Once;
-
+        myAnimation[SkillAnimClip.name].wrapMode = WrapMode.Once;
+        
         AddAnimationEvent(Attack1AnimClip, "OnAttackAnimFinished");
         AddAnimationEvent(Attack2AnimClip, "OnAttackAnimFinished");
         AddAnimationEvent(Attack3AnimClip, "OnAttackAnimFinished");
         AddAnimationEvent(Attack4AnimClip, "OnAttackAnimFinished");
+        AddAnimationEvent(SkillAnimClip, "OnSkillAnimFinished");
     }
 
     void Update()
@@ -78,6 +87,9 @@ public class FightControl : MonoBehaviour
 
         // Physics
         ApplyGravity();
+        
+        // Component Control
+        AttackComponentControl();
     }
 
     /// <summary>
@@ -177,6 +189,10 @@ public class FightControl : MonoBehaviour
 
             case FighterState.Attack:
                 AttackAnimationControl();
+                break;
+                
+            case FighterState.Skill:
+                AnimationPlay(SkillAnimClip);
                 break;
         }
     }
@@ -283,6 +299,17 @@ public class FightControl : MonoBehaviour
                 }
             }
         }
+        
+        if (Input.GetButton("Fire2") == true)
+        {
+            if (myState == FighterState.Attack)
+            {
+                myAttackState = FighterAttackState.Attack1;
+                NextAttack = false;
+            }
+            
+            myState = FighterState.Skill;
+        }
     }
 
     void OnAttackAnimFinished()
@@ -317,6 +344,14 @@ public class FightControl : MonoBehaviour
 
             CannotMove = false;
         }
+    }
+    
+    void OnSkillAnimFinished()
+    {
+        Vector3 position = transform.position;
+        position += transform.forward * 2.0f;
+        Instantiate(SkillEffect, position, Quaternion.identity);
+        myState = FighterState.Idle;
     }
 
     void AddAnimationEvent(AnimationClip clip, string FuncName)
@@ -358,6 +393,23 @@ public class FightControl : MonoBehaviour
         else
         {
             verticalSpeed -= gravity * Time.deltaTime;
+        }
+    }
+    
+    void AttackComponentControl()
+    {
+        switch (myState)
+        {
+            case FighterState.Attack:
+            case FighterState.Skill:
+                AttackTrailRenderer.enabled = true;
+                AttackCapsuleCollider.enabled = true;
+                break;
+                
+            default:
+                AttackTrailRenderer.enabled = false;
+                AttackCapsuleCollider.enabled = false;
+                break;
         }
     }
 

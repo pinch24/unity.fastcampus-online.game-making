@@ -32,7 +32,7 @@ public class GoblinControl : MonoBehaviour
     public GameObject DieEffect = null;
     private Tweener effectTweener = null;
     private SkinnedMeshRenderer skinMeshRenderer = null;
-
+    
     void Start()
     {
         // State
@@ -260,17 +260,20 @@ public class GoblinControl : MonoBehaviour
     /// </summary>
     void OnAttackAnimFinished()
     {
-        Debug.Log("Attack Animation finished.");
+        //Debug.Log("Attack Animation finished.");
     }
     
     void OnDamageAnimFinished()
     {
-        Debug.Log("Damage Animation finished.");
+        //Debug.Log("Damage Animation finished.");
     }
     
     void OnDieAnimFinished()
     {
-        Debug.Log("Die Animation finished.");
+        //Debug.Log("Die Animation finished.");
+        
+        Instantiate(DieEffect, myTransform.position, Quaternion.identity);
+        Destroy(gameObject);
     }
     
     void AddAnimationEvent(AnimationClip clip, string funcName)

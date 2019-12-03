@@ -463,7 +463,10 @@ MonoBehaviour:
   DieAnimClip: {fileID: 7400000, guid: dbe0c322afbe26142b1eb24bccff9c2f, type: 3}
   HP: 100
   AttackRange: 1.5
-  DamageEffect: {fileID: 0}
+  DamageEffect: {fileID: 5525284122811406732, guid: 6293f5e45186167438064909b150231d,
+    type: 3}
+  DieEffect: {fileID: 5822845797324206113, guid: 04add08dc33bb87458333322c0a4f2db,
+    type: 3}
 --- !u!1 &1304397002045172
 GameObject:
   m_ObjectHideFlags: 0
@@ -1528,7 +1531,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8428569082289259447}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4018702151084540}
@@ -1542,7 +1545,7 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8428569082289259447}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 5

@@ -642,7 +642,7 @@ GameObject:
   - component: {fileID: 1220947767}
   m_Layer: 0
   m_Name: Fighter
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -742,11 +742,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21d1b900c51e40c4eb3aaa04b0a06843, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WalkSpeed: 4
-  RunSpeed: 16
+  WalkSpeed: 2
+  RunSpeed: 4
   TurningSpeed: 100
   RotateSpeed: 2
-  VelocitySpeed: 0.2
+  VelocitySpeed: 0.8
   IdleAnimClip: {fileID: 7400000, guid: 2514ea8cbb18d40489c03853ad134c18, type: 3}
   WalkAnimClip: {fileID: 7400000, guid: 598e237eae4d4de43b1404b375b328c1, type: 3}
   RunAnimClip: {fileID: 7400000, guid: 5f51dc9e1efcf22449c14dca23cf5c4e, type: 3}
@@ -754,9 +754,14 @@ MonoBehaviour:
   Attack2AnimClip: {fileID: 7400000, guid: 4b2e5452f6656e74f93ebfb8cbaa5f6a, type: 3}
   Attack3AnimClip: {fileID: 7400000, guid: 9b4a0dc5fc18b5a468c1118d3a38b0b9, type: 3}
   Attack4AnimClip: {fileID: 7400000, guid: 4548d7bceba281d4d90297c6db3bea8b, type: 3}
+  SkillAnimClip: {fileID: 7400000, guid: 99e4c52a242f80c4ea1fdd4be1e14206, type: 3}
   myState: 0
   myAttackState: 0
   NextAttack: 0
+  AttackTrailRenderer: {fileID: 195227642035997718}
+  AttackCapsuleCollider: {fileID: 380339335467908977}
+  SkillEffect: {fileID: 5796853559463589560, guid: 1c6ebb599991b844c97084b2bb5bc5eb,
+    type: 3}
 --- !u!1 &1322759156337796
 GameObject:
   m_ObjectHideFlags: 0
