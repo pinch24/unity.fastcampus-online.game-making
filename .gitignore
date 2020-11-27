@@ -1,3 +1,10 @@
+# MacOSX
+.DS_Store
+
+# Ulysses
+.Ulysses-favorites.plist
+.Ulysses-Group.plist
+
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
